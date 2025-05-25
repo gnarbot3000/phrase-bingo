@@ -47,8 +47,7 @@ function submitPhrases() {
   });
   if (emptyIndices.length > 0) {
     emptyIndices.forEach(index => {
-      phraseInputs[index].classList.add("duplicate"); // Reuse 'duplicate' class for red border
-      // Note: You could add a separate 'empty' class here if different styling is desired
+      phraseInputs[index].classList.add("duplicate");
     });
     errors.push("All 24 cells must have a value. Empty cells are highlighted in red.");
   }
@@ -95,10 +94,36 @@ function submitPhrases() {
   loadPhrases();
 }
 
-// Attach event listener to submit button
+// Enable/disable Create Game button based on Game Name input
+function setupGameNameInput() {
+  const gameNameInput = document.getElementById("gameNameInput");
+  const createGameButton = document.getElementById("createGameButton");
+  
+  gameNameInput.addEventListener("input", () => {
+    const gameName = gameNameInput.value.trim();
+    createGameButton.disabled = gameName === "";
+  });
+}
+
+// Attach event listeners
 const submitButton = document.getElementById("submitButton");
 if (submitButton) {
-  submitButton.addEventListener("click", submitPhrases);
+  submitButton.addEventListener("click", () => {
+    submitPhrases();
+    setupGameNameInput(); // Set up the game name input listener after submission
+  });
 } else {
   console.error("Submit button not found");
+}
+
+// Note: Create Game button functionality can be added here
+const createGameButton = document.getElementById("createGameButton");
+if (createGameButton) {
+  createGameButton.addEventListener("click", () => {
+    const gameName = document.getElementById("gameNameInput").value.trim();
+    console.log("Creating game with name:", gameName);
+    // Add further game creation logic here as needed
+  });
+} else {
+  console.error("Create Game button not found");
 }
