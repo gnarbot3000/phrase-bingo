@@ -19,9 +19,36 @@ function submitPhrases() {
   
   console.log("Attempting to submit phrases:", phrases);
   
-  // Validate: Ensure at least one phrase is entered
-  if (phrases.every(phrase => phrase === "")) {
-    const errorMsg = "Please enter at least one phrase.";
+  // Reset any previous duplicate highlights
+  Array.from(phraseInputs).forEach(input => input.classList.remove("duplicate"));
+  
+  // Validate: Ensure all fields are non-empty
+  if (phrases.some(phrase => phrase === "")) {
+    const errorMsg = "All 24 cells must have a value.";
+    console.error(errorMsg);
+    alert(errorMsg);
+    return;
+  }
+  
+  // Validate: Check for duplicates
+  const seenPhrases = new Set();
+  const duplicates = new Set();
+  phrases.forEach((phrase, index) => {
+    if (seenPhrases.has(phrase)) {
+      duplicates.add(phrase);
+    } else {
+      seenPhrases.add(phrase);
+    }
+  });
+  
+  if (duplicates.size > 0) {
+    // Highlight duplicate cells
+    phrases.forEach((phrase, index) => {
+      if (duplicates.has(phrase)) {
+        phraseInputs[index].classList.add("duplicate");
+      }
+    });
+    const errorMsg = "All phrases must be unique. Duplicate phrases are highlighted in red.";
     console.error(errorMsg);
     alert(errorMsg);
     return;
