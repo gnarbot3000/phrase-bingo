@@ -12,9 +12,9 @@ const loadPhrases = () => {
 };
 
 // Display validation message
-const showValidationMessage = (message) => {
+const showValidationMessage = (messages) => {
   const validationMessage = document.getElementById("validationMessage");
-  validationMessage.textContent = message;
+  validationMessage.textContent = messages.join(" ");
 };
 
 // Clear validation message
@@ -35,19 +35,19 @@ function submitPhrases() {
   Array.from(phraseInputs).forEach(input => input.classList.remove("duplicate"));
   clearValidationMessage();
   
-  // Validate: Ensure all fields are non-empty
+  // Collect all validation errors
+  const errors = [];
+  
+  // Validate: Check for empty fields
   if (phrases.some(phrase => phrase === "")) {
-    const errorMsg = "All 24 cells must have a value.";
-    console.error(errorMsg);
-    showValidationMessage(errorMsg);
-    return;
+    errors.push("All 24 cells must have a value.");
   }
   
   // Validate: Check for duplicates
   const seenPhrases = new Set();
   const duplicates = new Set();
   phrases.forEach((phrase, index) => {
-    if (seenPhrases.has(phrase)) {
+    if (phrase && seenPhrases.has(phrase)) {
       duplicates.add(phrase);
     } else {
       seenPhrases.add(phrase);
@@ -61,9 +61,13 @@ function submitPhrases() {
         phraseInputs[index].classList.add("duplicate");
       }
     });
-    const errorMsg = "All phrases must be unique. Duplicate phrases are highlighted in red.";
-    console.error(errorMsg);
-    showValidationMessage(errorMsg);
+    errors.push("All phrases must be unique. Duplicate phrases are highlighted in red.");
+  }
+  
+  // If there are any errors, display them and stop
+  if (errors.length > 0) {
+    console.error("Validation errors:", errors);
+    showValidationMessage(errors);
     return;
   }
   
