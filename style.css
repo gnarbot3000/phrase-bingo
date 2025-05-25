@@ -62,3 +62,9 @@ section {
 .duplicate {
   border: 2px solid red !important;
 }
+.validation-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+  min-height: 20px;
+}

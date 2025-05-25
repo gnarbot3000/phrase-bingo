@@ -11,6 +11,18 @@ const loadPhrases = () => {
   });
 };
 
+// Display validation message
+const showValidationMessage = (message) => {
+  const validationMessage = document.getElementById("validationMessage");
+  validationMessage.textContent = message;
+};
+
+// Clear validation message
+const clearValidationMessage = () => {
+  const validationMessage = document.getElementById("validationMessage");
+  validationMessage.textContent = "";
+};
+
 // Submit all 24 phrases to sessionStorage and toggle visibility
 function submitPhrases() {
   const inputGrid = document.getElementById("inputGrid");
@@ -19,14 +31,15 @@ function submitPhrases() {
   
   console.log("Attempting to submit phrases:", phrases);
   
-  // Reset any previous duplicate highlights
+  // Reset any previous duplicate highlights and validation message
   Array.from(phraseInputs).forEach(input => input.classList.remove("duplicate"));
+  clearValidationMessage();
   
   // Validate: Ensure all fields are non-empty
   if (phrases.some(phrase => phrase === "")) {
     const errorMsg = "All 24 cells must have a value.";
     console.error(errorMsg);
-    alert(errorMsg);
+    showValidationMessage(errorMsg);
     return;
   }
   
@@ -50,7 +63,7 @@ function submitPhrases() {
     });
     const errorMsg = "All phrases must be unique. Duplicate phrases are highlighted in red.";
     console.error(errorMsg);
-    alert(errorMsg);
+    showValidationMessage(errorMsg);
     return;
   }
   
