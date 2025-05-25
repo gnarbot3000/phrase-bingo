@@ -66,6 +66,14 @@ function submitMessage() {
   }
 }
 
+// Attach event listener to submit button
+const submitButton = document.getElementById("submitButton");
+if (submitButton) {
+  submitButton.addEventListener("click", submitMessage);
+} else {
+  console.error("Submit button not found");
+}
+
 // Real-time listener for phrases
 if (db) {
   const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
