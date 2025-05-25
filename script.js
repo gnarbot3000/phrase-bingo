@@ -14,6 +14,9 @@ const firebaseConfig = {
   measurementId: process.env.MEASUREMENT_ID
 };
 
+//debug:
+console.log("Firebase Config:", firebaseConfig);
+
 // Initialize Firebase app and Firestore
 firebase.initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
