@@ -2,9 +2,6 @@
   "name": "phrase-bingo",
   "version": "1.0.0",
   "scripts": {
-    "build": "mkdir -p dist && envsub index.html dist/index.html && cp style.css script.js dist/"
-  },
-  "dependencies": {
-    "envsub": "^4.1.0"
+    "build": "mkdir -p dist && cp index.html style.css script.js dist/"
   }
 }
