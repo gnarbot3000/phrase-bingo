@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 console.log("Phrase Bingo website loaded successfully!");
 
@@ -17,22 +17,39 @@ const firebaseConfig = {
   measurementId: window.env.MEASUREMENT_ID
 };
 
-// Debug: Log Firebase config
+// Debug: Log Firebase config and validate
 console.log("Firebase Config:", firebaseConfig);
+try {
+  Object.values(firebaseConfig).forEach((value, index) => {
+    if (!value || value.includes('$')) {
+      throw new Error(`Invalid Firebase config at key ${Object.keys(firebaseConfig)[index]}: ${value}`);
+    }
+  });
+} catch (error) {
+  console.error("Firebase config validation error:", error.message);
+  alert("Firebase configuration error: " + error.message);
+}
 
 // Initialize Firebase app and Firestore
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+let app, db;
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  console.log("Firebase initialized successfully");
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+  alert("Failed to initialize Firebase: " + error.message);
+}
 
 // Submit a new phrase to Firestore
 function submitMessage() {
   const messageInput = document.getElementById("messageInput");
   const message = messageInput.value.trim();
   console.log("Attempting to submit phrase:", message);
-  if (message) {
+  if (message && db) {
     addDoc(collection(db, "messages"), {
       text: message,
-      timestamp: new Date() // Use client-side timestamp as fallback
+      timestamp: serverTimestamp()
     })
     .then(() => {
       console.log("Phrase added successfully!");
@@ -43,27 +60,34 @@ function submitMessage() {
       alert("Failed to submit phrase: " + error.message);
     });
   } else {
-    alert("Please enter a phrase.");
+    const errorMsg = !message ? "Please enter a phrase." : "Firestore not initialized.";
+    console.error(errorMsg);
+    alert(errorMsg);
   }
 }
 
 // Real-time listener for phrases
-const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
-onSnapshot(q, (snapshot) => {
-  console.log("Snapshot received, size:", snapshot.size);
-  const messageList = document.getElementById("messageList");
-  messageList.innerHTML = "";
-  if (snapshot.empty) {
-    console.log("No phrases found");
-    messageList.innerHTML = "<li>No phrases available</li>";
-  }
-  snapshot.forEach((doc) => {
-    const message = doc.data().text;
-    const li = document.createElement("li");
-    li.textContent = message;
-    messageList.appendChild(li);
+if (db) {
+  const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
+  onSnapshot(q, (snapshot) => {
+    console.log("Snapshot received, size:", snapshot.size);
+    const messageList = document.getElementById("messageList");
+    messageList.innerHTML = "";
+    if (snapshot.empty) {
+      console.log("No phrases found");
+      messageList.innerHTML = "<li>No phrases available</li>";
+    }
+    snapshot.forEach((doc) => {
+      const message = doc.data().text;
+      const li = document.createElement("li");
+      li.textContent = message;
+      messageList.appendChild(li);
+    });
+  }, (error) => {
+    console.error("Error fetching phrases: ", error);
+    alert("Failed to fetch phrases: " + error.message);
   });
-}, (error) => {
-  console.error("Error fetching phrases: ", error);
-  alert("Failed to fetch phrases: " + error.message);
-});
+} else {
+  console.error("Firestore not initialized, skipping listener setup");
+  alert("Firestore not initialized, cannot fetch phrases.");
+}
