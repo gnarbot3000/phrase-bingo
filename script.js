@@ -1,6 +1,6 @@
 console.log("Phrase Bingo website loaded successfully!");
 
-// Load phrases from sessionStorage on page load
+// Load phrases from sessionStorage and display them
 const loadPhrases = () => {
   const displayGrid = document.getElementById("displayGrid");
   const phraseDisplays = displayGrid.getElementsByClassName("phrase-display");
@@ -11,7 +11,7 @@ const loadPhrases = () => {
   });
 };
 
-// Submit all 24 phrases to sessionStorage
+// Submit all 24 phrases to sessionStorage and toggle visibility
 function submitPhrases() {
   const inputGrid = document.getElementById("inputGrid");
   const phraseInputs = inputGrid.getElementsByClassName("phrase-input");
@@ -34,7 +34,11 @@ function submitPhrases() {
   // Clear input fields
   Array.from(phraseInputs).forEach(input => input.value = "");
   
-  // Reload phrases into display grid
+  // Hide input section and show display section
+  document.getElementById("inputSection").style.display = "none";
+  document.getElementById("displaySection").style.display = "block";
+  
+  // Load phrases into display grid
   loadPhrases();
 }
 
@@ -45,6 +49,3 @@ if (submitButton) {
 } else {
   console.error("Submit button not found");
 }
-
-// Initial load of phrases
-loadPhrases();

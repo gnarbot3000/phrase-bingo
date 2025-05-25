@@ -56,3 +56,6 @@ section {
   background-color: #fff;
   word-wrap: break-word;
 }
+#displaySection {
+  display: none;
+}
