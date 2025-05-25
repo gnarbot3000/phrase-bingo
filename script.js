@@ -31,19 +31,29 @@ function submitPhrases() {
   
   console.log("Attempting to submit phrases:", phrases);
   
-  // Reset any previous duplicate highlights and validation message
+  // Reset any previous highlights and validation message
   Array.from(phraseInputs).forEach(input => input.classList.remove("duplicate"));
   clearValidationMessage();
   
   // Collect all validation errors
   const errors = [];
   
-  // Validate: Check for empty fields
-  if (phrases.some(phrase => phrase === "")) {
-    errors.push("All 24 cells must have a value.");
+  // Validate: Check for empty fields and highlight them
+  const emptyIndices = [];
+  phrases.forEach((phrase, index) => {
+    if (phrase === "") {
+      emptyIndices.push(index);
+    }
+  });
+  if (emptyIndices.length > 0) {
+    emptyIndices.forEach(index => {
+      phraseInputs[index].classList.add("duplicate"); // Reuse 'duplicate' class for red border
+      // Note: You could add a separate 'empty' class here if different styling is desired
+    });
+    errors.push("All 24 cells must have a value. Empty cells are highlighted in red.");
   }
   
-  // Validate: Check for duplicates
+  // Validate: Check for duplicates and highlight them
   const seenPhrases = new Set();
   const duplicates = new Set();
   phrases.forEach((phrase, index) => {
@@ -55,7 +65,6 @@ function submitPhrases() {
   });
   
   if (duplicates.size > 0) {
-    // Highlight duplicate cells
     phrases.forEach((phrase, index) => {
       if (duplicates.has(phrase)) {
         phraseInputs[index].classList.add("duplicate");
