@@ -20,27 +20,39 @@ button {
   color: white;
   border: none;
   cursor: pointer;
+  margin-top: 1rem;
 }
 button:hover {
   background-color: #218838;
 }
-input {
-  padding: 10px;
-  font-size: 16px;
-  margin-right: 10px;
-  width: 200px;
-}
 section {
   margin: 2rem 0;
 }
-ul {
-  list-style: none;
-  padding: 0;
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(6, auto);
+  gap: 5px;
+  max-width: 480px;
+  margin: 0 auto;
 }
-li {
-  background-color: white;
+.phrase-input, .phrase-display {
   padding: 10px;
-  margin: 5px 0;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.phrase-input {
+  width: 100%;
+  box-sizing: border-box;
+}
+.phrase-display {
+  background-color: #fff;
+  word-wrap: break-word;
 }

@@ -52,19 +52,69 @@
   <main>
     <p>This is a simple website hosted on Vercel with a custom domain from Squarespace, storing phrases in your browser session.</p>
     
-    <!-- Form to submit phrases -->
+    <!-- Form to submit 24 phrases -->
     <section>
-      <h2>Submit a Phrase</h2>
-      <div>
-        <input type="text" id="messageInput" placeholder="Enter your phrase" required>
-        <button id="submitButton">Submit</button>
+      <h2>Enter Your 24 Bingo Phrases</h2>
+      <div class="bingo-grid" id="inputGrid">
+        <!-- 4x6 grid, 24 inputs -->
+        <input type="text" class="phrase-input" data-index="0">
+        <input type="text" class="phrase-input" data-index="1">
+        <input type="text" class="phrase-input" data-index="2">
+        <input type="text" class="phrase-input" data-index="3">
+        <input type="text" class="phrase-input" data-index="4">
+        <input type="text" class="phrase-input" data-index="5">
+        <input type="text" class="phrase-input" data-index="6">
+        <input type="text" class="phrase-input" data-index="7">
+        <input type="text" class="phrase-input" data-index="8">
+        <input type="text" class="phrase-input" data-index="9">
+        <input type="text" class="phrase-input" data-index="10">
+        <input type="text" class="phrase-input" data-index="11">
+        <input type="text" class="phrase-input" data-index="12">
+        <input type="text" class="phrase-input" data-index="13">
+        <input type="text" class="phrase-input" data-index="14">
+        <input type="text" class="phrase-input" data-index="15">
+        <input type="text" class="phrase-input" data-index="16">
+        <input type="text" class="phrase-input" data-index="17">
+        <input type="text" class="phrase-input" data-index="18">
+        <input type="text" class="phrase-input" data-index="19">
+        <input type="text" class="phrase-input" data-index="20">
+        <input type="text" class="phrase-input" data-index="21">
+        <input type="text" class="phrase-input" data-index="22">
+        <input type="text" class="phrase-input" data-index="23">
       </div>
+      <button id="submitButton">Submit Phrases</button>
     </section>
     
     <!-- Display phrases -->
     <section>
-      <h2>Your Session Phrases</h2>
-      <ul id="messageList"></ul>
+      <h2>Your Session Bingo Card</h2>
+      <div class="bingo-grid" id="displayGrid">
+        <!-- 4x6 grid for display -->
+        <div class="phrase-display" data-index="0"></div>
+        <div class="phrase-display" data-index="1"></div>
+        <div class="phrase-display" data-index="2"></div>
+        <div class="phrase-display" data-index="3"></div>
+        <div class="phrase-display" data-index="4"></div>
+        <div class="phrase-display" data-index="5"></div>
+        <div class="phrase-display" data-index="6"></div>
+        <div class="phrase-display" data-index="7"></div>
+        <div class="phrase-display" data-index="8"></div>
+        <div class="phrase-display" data-index="9"></div>
+        <div class="phrase-display" data-index="10"></div>
+        <div class="phrase-display" data-index="11"></div>
+        <div class="phrase-display" data-index="12"></div>
+        <div class="phrase-display" data-index="13"></div>
+        <div class="phrase-display" data-index="14"></div>
+        <div class="phrase-display" data-index="15"></div>
+        <div class="phrase-display" data-index="16"></div>
+        <div class="phrase-display" data-index="17"></div>
+        <div class="phrase-display" data-index="18"></div>
+        <div class="phrase-display" data-index="19"></div>
+        <div class="phrase-display" data-index="20"></div>
+        <div class="phrase-display" data-index="21"></div>
+        <div class="phrase-display" data-index="22"></div>
+        <div class="phrase-display" data-index="23"></div>
+      </div>
     </section>
 
     <script type="module" src="script.js"></script>

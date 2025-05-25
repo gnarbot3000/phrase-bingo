@@ -2,43 +2,46 @@ console.log("Phrase Bingo website loaded successfully!");
 
 // Load phrases from sessionStorage on page load
 const loadPhrases = () => {
-  const messageList = document.getElementById("messageList");
-  messageList.innerHTML = "";
-  const phrases = JSON.parse(sessionStorage.getItem("phrases")) || [];
-  if (phrases.length === 0) {
-    messageList.innerHTML = "<li>No phrases added this session</li>";
-  } else {
-    phrases.forEach((phrase) => {
-      const li = document.createElement("li");
-      li.textContent = phrase.text;
-      messageList.appendChild(li);
-    });
-  }
+  const displayGrid = document.getElementById("displayGrid");
+  const phraseDisplays = displayGrid.getElementsByClassName("phrase-display");
+  const phrases = JSON.parse(sessionStorage.getItem("phrases")) || Array(24).fill("");
+  
+  Array.from(phraseDisplays).forEach((display, index) => {
+    display.textContent = phrases[index] || "";
+  });
 };
 
-// Submit a new phrase to sessionStorage
-function submitMessage() {
-  const messageInput = document.getElementById("messageInput");
-  const message = messageInput.value.trim();
-  console.log("Attempting to submit phrase:", message);
-  if (message) {
-    const phrases = JSON.parse(sessionStorage.getItem("phrases")) || [];
-    phrases.push({ text: message, timestamp: new Date().toISOString() });
-    sessionStorage.setItem("phrases", JSON.stringify(phrases));
-    console.log("Phrase added successfully!");
-    messageInput.value = "";
-    loadPhrases();
-  } else {
-    const errorMsg = "Please enter a phrase.";
+// Submit all 24 phrases to sessionStorage
+function submitPhrases() {
+  const inputGrid = document.getElementById("inputGrid");
+  const phraseInputs = inputGrid.getElementsByClassName("phrase-input");
+  const phrases = Array.from(phraseInputs).map(input => input.value.trim());
+  
+  console.log("Attempting to submit phrases:", phrases);
+  
+  // Validate: Ensure at least one phrase is entered
+  if (phrases.every(phrase => phrase === "")) {
+    const errorMsg = "Please enter at least one phrase.";
     console.error(errorMsg);
     alert(errorMsg);
+    return;
   }
+  
+  // Store phrases in sessionStorage
+  sessionStorage.setItem("phrases", JSON.stringify(phrases));
+  console.log("Phrases added successfully!");
+  
+  // Clear input fields
+  Array.from(phraseInputs).forEach(input => input.value = "");
+  
+  // Reload phrases into display grid
+  loadPhrases();
 }
 
 // Attach event listener to submit button
 const submitButton = document.getElementById("submitButton");
 if (submitButton) {
-  submitButton.addEventListener("click", submitMessage);
+  submitButton.addEventListener("click", submitPhrases);
 } else {
   console.error("Submit button not found");
 }
