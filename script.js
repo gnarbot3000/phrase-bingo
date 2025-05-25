@@ -3,8 +3,8 @@ import { getFirestore, collection, addDoc, query, orderBy, onSnapshot } from "ht
 
 console.log("Phrase Bingo website loaded successfully!");
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Debug: Log environment variables
+console.log("Environment variables:", window.env);
 
 // Initialize Firebase using environment variables
 const firebaseConfig = {
@@ -17,32 +17,30 @@ const firebaseConfig = {
   measurementId: window.env.MEASUREMENT_ID
 };
 
-//debug:
+// Debug: Log Firebase config
 console.log("Firebase Config:", firebaseConfig);
 
 // Initialize Firebase app and Firestore
-firebase.initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // Submit a new phrase to Firestore
 function submitMessage() {
   const messageInput = document.getElementById("messageInput");
   const message = messageInput.value.trim();
-  
+  console.log("Attempting to submit phrase:", message);
   if (message) {
-    db.collection("messages").add({
+    addDoc(collection(db, "messages"), {
       text: message,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      timestamp: new Date() // Use client-side timestamp as fallback
     })
     .then(() => {
       console.log("Phrase added successfully!");
-      messageInput.value = ""; // Clear input
+      messageInput.value = "";
     })
     .catch((error) => {
       console.error("Error adding phrase: ", error);
-      alert("Failed to submit phrase.");
+      alert("Failed to submit phrase: " + error.message);
     });
   } else {
     alert("Please enter a phrase.");
@@ -50,17 +48,22 @@ function submitMessage() {
 }
 
 // Real-time listener for phrases
-db.collection("messages")
-  .orderBy("timestamp", "desc")
-  .onSnapshot((snapshot) => {
-    const messageList = document.getElementById("messageList");
-    messageList.innerHTML = ""; // Clear existing list
-    snapshot.forEach((doc) => {
-      const message = doc.data().text;
-      const li = document.createElement("li");
-      li.textContent = message;
-      messageList.appendChild(li);
-    });
-  }, (error) => {
-    console.error("Error fetching phrases: ", error);
+const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
+onSnapshot(q, (snapshot) => {
+  console.log("Snapshot received, size:", snapshot.size);
+  const messageList = document.getElementById("messageList");
+  messageList.innerHTML = "";
+  if (snapshot.empty) {
+    console.log("No phrases found");
+    messageList.innerHTML = "<li>No phrases available</li>";
+  }
+  snapshot.forEach((doc) => {
+    const message = doc.data().text;
+    const li = document.createElement("li");
+    li.textContent = message;
+    messageList.appendChild(li);
   });
+}, (error) => {
+  console.error("Error fetching phrases: ", error);
+  alert("Failed to fetch phrases: " + error.message);
+});
