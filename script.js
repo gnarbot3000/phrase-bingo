@@ -21,7 +21,7 @@ const firebaseConfig = {
 console.log("Firebase Config:", firebaseConfig);
 try {
   Object.values(firebaseConfig).forEach((value, index) => {
-    if (!value || value.includes('$')) {
+    if (!value || value.includes('$') || value.includes('${')) {
       throw new Error(`Invalid Firebase config at key ${Object.keys(firebaseConfig)[index]}: ${value}`);
     }
   });

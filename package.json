@@ -1,0 +1,10 @@
+{
+  "name": "phrase-bingo",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "envsub index.html dist/index.html"
+  },
+  "dependencies": {
+    "envsub": "^4.1.0"
+  }
+}
