@@ -40,90 +40,295 @@
         </script><!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phrase Bingo Website</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Game</title>
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.15/babel.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-router-dom@6.4.3/dist/umd/react-router-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/env.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Welcome to Phrase Bingo</h1>
-  </header>
-  <main>
-    <p>This is a simple website hosted on Vercel with a custom domain from Squarespace, storing phrases in your browser session.</p>
-    
-    <!-- Form to submit 24 phrases -->
-    <section id="inputSection">
-      <h2>Enter Your 24 Bingo Phrases</h2>
-      <div class="bingo-grid" id="inputGrid">
-        <!-- 4x6 grid, 24 inputs -->
-        <input type="text" class="phrase-input" data-index="0">
-        <input type="text" class="phrase-input" data-index="1">
-        <input type="text" class="phrase-input" data-index="2">
-        <input type="text" class="phrase-input" data-index="3">
-        <input type="text" class="phrase-input" data-index="4">
-        <input type="text" class="phrase-input" data-index="5">
-        <input type="text" class="phrase-input" data-index="6">
-        <input type="text" class="phrase-input" data-index="7">
-        <input type="text" class="phrase-input" data-index="8">
-        <input type="text" class="phrase-input" data-index="9">
-        <input type="text" class="phrase-input" data-index="10">
-        <input type="text" class="phrase-input" data-index="11">
-        <input type="text" class="phrase-input" data-index="12">
-        <input type="text" class="phrase-input" data-index="13">
-        <input type="text" class="phrase-input" data-index="14">
-        <input type="text" class="phrase-input" data-index="15">
-        <input type="text" class="phrase-input" data-index="16">
-        <input type="text" class="phrase-input" data-index="17">
-        <input type="text" class="phrase-input" data-index="18">
-        <input type="text" class="phrase-input" data-index="19">
-        <input type="text" class="phrase-input" data-index="20">
-        <input type="text" class="phrase-input" data-index="21">
-        <input type="text" class="phrase-input" data-index="22">
-        <input type="text" class="phrase-input" data-index="23">
-      </div>
-      <div id="validationMessage" class="validation-message"></div>
-      <button id="submitButton">Submit Phrases</button>
-    </section>
-    
-    <!-- Display phrases -->
-    <section id="displaySection">
-      <h2>Your Session Bingo Card</h2>
-      <div class="bingo-grid" id="displayGrid">
-        <!-- 4x6 grid for display -->
-        <div class="phrase-display" data-index="0"></div>
-        <div class="phrase-display" data-index="1"></div>
-        <div class="phrase-display" data-index="2"></div>
-        <div class="phrase-display" data-index="3"></div>
-        <div class="phrase-display" data-index="4"></div>
-        <div class="phrase-display" data-index="5"></div>
-        <div class="phrase-display" data-index="6"></div>
-        <div class="phrase-display" data-index="7"></div>
-        <div class="phrase-display" data-index="8"></div>
-        <div class="phrase-display" data-index="9"></div>
-        <div class="phrase-display" data-index="10"></div>
-        <div class="phrase-display" data-index="11"></div>
-        <div class="phrase-display" data-index="12"></div>
-        <div class="phrase-display" data-index="13"></div>
-        <div class="phrase-display" data-index="14"></div>
-        <div class="phrase-display" data-index="15"></div>
-        <div class="phrase-display" data-index="16"></div>
-        <div class="phrase-display" data-index="17"></div>
-        <div class="phrase-display" data-index="18"></div>
-        <div class="phrase-display" data-index="19"></div>
-        <div class="phrase-display" data-index="20"></div>
-        <div class="phrase-display" data-index="21"></div>
-        <div class="phrase-display" data-index="22"></div>
-        <div class="phrase-display" data-index="23"></div>
-      </div>
-      <div class="game-name-section">
-        <input type="text" id="gameNameInput" placeholder="Enter Game Name">
-        <button id="createGameButton" disabled>Create Game</button>
-      </div>
-    </section>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { BrowserRouter, Route, Routes, useNavigate, useParams } = window.ReactRouterDOM;
 
-    <!-- Load environment variables before script.js -->
-    <script src="env-config.js"></script>
-    <script type="module" src="script.js"></script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: window.ENV.FIREBASE_API_KEY,
+            authDomain: window.ENV.FIREBASE_AUTH_DOMAIN,
+            projectId: window.ENV.FIREBASE_PROJECT_ID,
+            storageBucket: window.ENV.FIREBASE_STORAGE_BUCKET,
+            messagingSenderId: window.ENV.FIREBASE_MESSAGING_SENDER_ID,
+            appId: window.ENV.FIREBASE_APP_ID,
+            measurementId: window.ENV.FIREBASE_MEASUREMENT_ID
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Utility to shuffle array
+        const shuffleArray = (array) => {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        };
+
+        // Game Creation Component
+        const GameCreation = () => {
+            const [gameName, setGameName] = useState('');
+            const [phrases, setPhrases] = useState(Array(24).fill(''));
+            const [error, setError] = useState('');
+            const [invalidIndices, setInvalidIndices] = useState([]);
+            const navigate = useNavigate();
+
+            const handlePhraseChange = (index, value) => {
+                const newPhrases = [...phrases];
+                newPhrases[index] = value;
+                setPhrases(newPhrases);
+                validatePhrases(newPhrases);
+            };
+
+            const validatePhrases = (phrasesToValidate) => {
+                const invalid = [];
+                const seen = new Set();
+                phrasesToValidate.forEach((phrase, index) => {
+                    const trimmed = phrase.trim();
+                    // Check for whitespace-only or empty
+                    if (!trimmed) {
+                        invalid.push(index);
+                    }
+                    // Check for duplicates (case-insensitive)
+                    const lowerPhrase = trimmed.toLowerCase();
+                    if (seen.has(lowerPhrase) && trimmed) {
+                        invalid.push(index);
+                    } else {
+                        seen.add(lowerPhrase);
+                    }
+                });
+                setInvalidIndices(invalid);
+                if (invalid.length > 0) {
+                    setError('Please ensure all phrases are unique and not empty or whitespace-only');
+                } else {
+                    setError('');
+                }
+                return invalid.length === 0;
+            };
+
+            const handleSubmit = async () => {
+                if (!gameName || !validatePhrases(phrases)) {
+                    if (!gameName) {
+                        setError('Please fill in game name and ensure all phrases are unique and not empty');
+                    }
+                    return;
+                }
+
+                try {
+                    const gameRef = db.collection('games').doc(gameName);
+                    await gameRef.set({
+                        creator: 'public',
+                        phrases,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        toggled: Array(24).fill(false)
+                    });
+                    setError('');
+                    setGameName('');
+                    setPhrases(Array(24).fill(''));
+                    setInvalidIndices([]);
+                    navigate(`/game/${gameName}`);
+                } catch (err) {
+                    setError('Error creating game: ' + err.message);
+                }
+            };
+
+            return (
+                <div className="p-4 max-w-2xl mx-auto">
+                    <h1 className="text-2xl font-bold mb-4">Create Bingo Game</h1>
+                    {error && <p className="text-red-500 mb-4">{error}</p>}
+                    <input
+                        type="text"
+                        value={gameName}
+                        onChange={(e) => setGameName(e.target.value)}
+                        placeholder="Game Name"
+                        className="w-full p-2 mb-4 border rounded"
+                    />
+                    <div className="grid grid-cols-3 gap-2">
+                        {phrases.map((phrase, index) => (
+                            <input
+                                key={index}
+                                type="text"
+                                value={phrase}
+                                onChange={(e) => handlePhraseChange(index, e.target.value)}
+                                placeholder={`Phrase ${index + 1}`}
+                                className={`p-2 border rounded ${
+                                    invalidIndices.includes(index)
+                                        ? 'border-red-500 bg-red-100'
+                                        : 'border-gray-300'
+                                }`}
+                            />
+                        ))}
+                    </div>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={invalidIndices.length > 0 || !gameName}
+                        className={`mt-4 px-4 py-2 rounded text-white ${
+                            invalidIndices.length > 0 || !gameName
+                                ? 'bg-gray-400 cursor-not-allowed'
+                                : 'bg-blue-500 hover:bg-blue-600'
+                        }`}
+                    >
+                        Create Game
+                    </button>
+                </div>
+            );
+        };
+
+        // Game Board Component
+        const GameBoard = () => {
+            const { gameName } = useParams();
+            const [playerName, setPlayerName] = useState('');
+            const [board, setBoard] = useState([]);
+            const [toggled, setToggled] = useState(Array(25).fill(false));
+            const [gameData, setGameData] = useState(null);
+            const [error, setError] = useState('');
+
+            useEffect(() => {
+                // Fetch game data
+                const fetchGame = async () => {
+                    try {
+                        const gameRef = db.collection('games').doc(gameName);
+                        const doc = await gameRef.get();
+                        if (doc.exists) {
+                            setGameData(doc.data());
+                            // Generate board
+                            const phrases = shuffleArray([...doc.data().phrases]);
+                            const boardLayout = Array(25).fill('');
+                            phrases.forEach((phrase, i) => {
+                                if (i < 12) boardLayout[i] = phrase;
+                                else boardLayout[i + 1] = phrase;
+                            });
+                            boardLayout[12] = 'FREE';
+                            setBoard(boardLayout);
+                            setToggled(prev => {
+                                const newToggled = [...prev];
+                                newToggled[12] = true;
+                                return newToggled;
+                            });
+                        } else {
+                            setError('Game not found');
+                        }
+                    } catch (err) {
+                        setError('Error loading game: ' + err.message);
+                    }
+                };
+                fetchGame();
+            }, [gameName]);
+
+            const handleToggle = async (index) => {
+                if (index === 12) return; // Free cell can't be toggled
+                if (!playerName) {
+                    setError('Please enter player name');
+                    return;
+                }
+
+                const newToggled = [...toggled];
+                newToggled[index] = !newToggled[index];
+                setToggled(newToggled);
+
+                try {
+                    // Update gameplay collection
+                    const gameplayRef = db.collection('gameplay').doc(`${gameName}_${playerName}`);
+                    await gameplayRef.set({
+                        gameName,
+                        playerName,
+                        board,
+                        toggled: newToggled,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
+                    // Update game collection
+                    const gameRef = db.collection('games').doc(gameName);
+                    const gameToggled = [...gameData.toggled];
+                    const phraseIndex = board[index] !== 'FREE' ? gameData.phrases.indexOf(board[index]) : -1;
+                    if (phraseIndex !== -1) {
+                        gameToggled[phraseIndex] = newToggled[index];
+                        await gameRef.update({ toggled: gameToggled });
+                    }
+
+                    // Update other players' gameplay documents
+                    const gameplayDocs = await db.collection('gameplay')
+                        .where('gameName', '==', gameName)
+                        .get();
+                    const batch = db.batch();
+                    gameplayDocs.forEach(doc => {
+                        if (doc.id !== `${gameName}_${playerName}`) {
+                            const docData = doc.data();
+                            const otherToggled = [...docData.toggled];
+                            const otherBoard = docData.board;
+                            const otherIndex = otherBoard.indexOf(board[index]);
+                            if (otherIndex !== -1 && otherIndex !== 12) {
+                                otherToggled[otherIndex] = newToggled[index];
+                                batch.update(doc.ref, { toggled: otherToggled });
+                            }
+                        }
+                    });
+                    await batch.commit();
+                } catch (err) {
+                    setError('Error updating game state: ' + err.message);
+                }
+            };
+
+            if (error) return <div className="text-red-500 p-4">{error}</div>;
+            if (!gameData) return <div className="p-4">Loading...</div>;
+
+            return (
+                <div className="p-4 max-w-2xl mx-auto">
+                    <h1 className="text-2xl font-bold mb-4">Bingo Game: {gameName}</h1>
+                    <input
+                        type="text"
+                        value={playerName}
+                        onChange={(e) => setPlayerName(e.target.value)}
+                        placeholder="Player Name"
+                        className="w-full p-2 mb-4 border rounded"
+                    />
+                    <div className="grid grid-cols-5 gap-2">
+                        {board.map((phrase, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handleToggle(index)}
+                                className={`p-4 border rounded text-center h-24 flex items-center justify-center ${
+                                    toggled[index] ? 'bg-green-500 text-white' : 'bg-white'
+                                } ${index === 12 ? 'bg-yellow-300' : ''}`}
+                                disabled={index === 12}
+                            >
+                                {phrase}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            return (
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<GameCreation />} />
+                        <Route path="/game/:gameName" element={<GameBoard />} />
+                    </Routes>
+                </BrowserRouter>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
 </body>
 </html>
