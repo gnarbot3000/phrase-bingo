@@ -31,6 +31,12 @@ const substituteEnvVars = (content) => {
     FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID || ''
   };
 
+  // Log all environment variables for debugging
+  console.log("Environment variables available during build:");
+  Object.keys(envVars).forEach(key => {
+    console.log(`${key}: ${envVars[key] || 'undefined'}`);
+  });
+
   // Check for missing critical environment variables
   const criticalVars = ['FIREBASE_PROJECT_ID', 'FIREBASE_API_KEY', 'FIREBASE_APP_ID'];
   const missingCriticalVars = criticalVars.filter(key => !envVars[key]);
@@ -49,8 +55,14 @@ const substituteEnvVars = (content) => {
   let updatedContent = content;
   for (const [key, value] of Object.entries(envVars)) {
     const placeholder = `\${${key}}`;
-    updatedContent = updatedContent.replace(new RegExp(placeholder, 'g'), value);
+    console.log(`Replacing placeholder ${placeholder} with value: ${value}`);
+    updatedContent = updatedContent.replace(new RegExp(placeholder.replace(/\$/g, '\\$'), 'g'), value);
   }
+
+  // Log the final content for debugging
+  console.log("Updated env-config.js content after substitution:");
+  console.log(updatedContent);
+
   return updatedContent;
 };
 

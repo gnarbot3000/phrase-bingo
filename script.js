@@ -21,6 +21,15 @@ const firebaseConfig = {
 // Log firebaseConfig to debug
 console.log("firebaseConfig:", firebaseConfig);
 
+// Validate firebaseConfig
+const missingConfigFields = Object.keys(firebaseConfig).filter(
+  key => typeof firebaseConfig[key] === 'string' && firebaseConfig[key].includes('${')
+);
+if (missingConfigFields.length > 0) {
+  console.error("Environment variable substitution failed for the following fields:", missingConfigFields);
+  throw new Error("Firebase configuration contains unsubstituted placeholders. Check build process.");
+}
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
