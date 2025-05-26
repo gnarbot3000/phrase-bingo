@@ -1,5 +1,24 @@
 console.log("Phrase Bingo website loaded successfully!");
 
+// Import Firebase modules
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+// Firebase configuration using window.env
+const firebaseConfig = {
+  apiKey: window.env.FIREBASE_API_KEY,
+  authDomain: window.env.FIREBASE_AUTH_DOMAIN,
+  projectId: window.env.FIREBASE_PROJECT_ID,
+  storageBucket: window.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: window.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: window.env.FIREBASE_APP_ID,
+  measurementId: window.env.FIREBASE_MEASUREMENT_ID
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 // Load phrases from sessionStorage and display them
 const loadPhrases = () => {
   const displayGrid = document.getElementById("displayGrid");
@@ -105,25 +124,41 @@ function setupGameNameInput() {
   });
 }
 
+// Store game data in Firestore
+async function createGame() {
+  const gameNameInput = document.getElementById("gameNameInput");
+  const gameName = gameNameInput.value.trim();
+  const phrases = JSON.parse(sessionStorage.getItem("phrases")) || Array(24).fill("");
+  
+  try {
+    // Use gameName as the document ID in the 'games' collection
+    await setDoc(doc(db, "games", gameName), {
+      gameName: gameName,
+      phrases: phrases,
+      createdAt: new Date().toISOString()
+    });
+    console.log("Game created successfully in Firestore with name:", gameName);
+    alert("Game created successfully!");
+  } catch (error) {
+    console.error("Error creating game in Firestore:", error);
+    alert("Failed to create game. Please try again.");
+  }
+}
+
 // Attach event listeners
 const submitButton = document.getElementById("submitButton");
 if (submitButton) {
   submitButton.addEventListener("click", () => {
     submitPhrases();
-    setupGameNameInput(); // Set up the game name input listener after submission
+    setupGameNameInput();
   });
 } else {
   console.error("Submit button not found");
 }
 
-// Note: Create Game button functionality can be added here
 const createGameButton = document.getElementById("createGameButton");
 if (createGameButton) {
-  createGameButton.addEventListener("click", () => {
-    const gameName = document.getElementById("gameNameInput").value.trim();
-    console.log("Creating game with name:", gameName);
-    // Add further game creation logic here as needed
-  });
+  createGameButton.addEventListener("click", createGame);
 } else {
   console.error("Create Game button not found");
 }
