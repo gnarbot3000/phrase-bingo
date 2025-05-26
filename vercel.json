@@ -1,20 +1,18 @@
-```json
+ {
+   "rewrites": [
      {
-       "rewrites": [
-         {
-           "source": "/(.*)",
-           "destination": "/index.html"
-         }
-       ],
-       "builds": [
-         {
-           "src": "*.html",
-           "use": "@vercel/static"
-         },
-         {
-           "src": "*.js",
-           "use": "@vercel/static"
-         }
-       ]
+       "source": "/(.*)",
+       "destination": "/index.html"
      }
-     ```
+   ],
+   "builds": [
+     {
+       "src": "*.html",
+       "use": "@vercel/static"
+     },
+     {
+       "src": "*.js",
+       "use": "@vercel/static"
+     }
+   ]
+ }
