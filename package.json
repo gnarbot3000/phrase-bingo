@@ -2,6 +2,10 @@
   "name": "phrase-bingo",
   "version": "1.0.0",
   "scripts": {
-    "build": "mkdir -p dist && cp index.html style.css script.js dist/ && cp env-config.js dist/"
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "path": "^0.12.7"
   }
 }
