@@ -9,15 +9,27 @@
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.15/babel.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-router-dom@6.26.2/dist/umd/react-router-dom.production.min.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.26.1/dist/umd/react-router-dom.production.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/env.js"></script>
 </head>
 <body>
     <div id="root"></div>
-    <script type="text/babel">
+    <script type="text/babel" defer>
         const { useState, useEffect } = React;
-        const { BrowserRouter, Route, Routes, useNavigate, useParams } = window.ReactRouterDOM;
+        // Debug react-router-dom loading
+        if (!window.ReactRouterDOM) {
+            console.error('react-router-dom not loaded');
+            throw new Error('react-router-dom failed to load');
+        }
+        console.log('react-router-dom loaded:', window.ReactRouterDOM);
+        const {
+            BrowserRouter = window.ReactRouterDOM.BrowserRouter,
+            Route = window.ReactRouterDOM.Route,
+            Routes = window.ReactRouterDOM.Routes,
+            useNavigate = window.ReactRouterDOM.useNavigate,
+            useParams = window.ReactRouterDOM.useParams
+        } = window.ReactRouterDOM;
 
         // Firebase configuration
         const firebaseConfig = {
@@ -62,11 +74,9 @@
                 const seen = new Set();
                 phrasesToValidate.forEach((phrase, index) => {
                     const trimmed = phrase.trim();
-                    // Check for whitespace-only or empty
                     if (!trimmed) {
                         invalid.push(index);
                     }
-                    // Check for duplicates (case-insensitive)
                     const lowerPhrase = trimmed.toLowerCase();
                     if (seen.has(lowerPhrase) && trimmed) {
                         invalid.push(index);
@@ -161,14 +171,12 @@
             const [error, setError] = useState('');
 
             useEffect(() => {
-                // Fetch game data
                 const fetchGame = async () => {
                     try {
                         const gameRef = db.collection('games').doc(gameName);
                         const doc = await gameRef.get();
                         if (doc.exists) {
                             setGameData(doc.data());
-                            // Generate board
                             const phrases = shuffleArray([...doc.data().phrases]);
                             const boardLayout = Array(25).fill('');
                             phrases.forEach((phrase, i) => {
@@ -193,7 +201,7 @@
             }, [gameName]);
 
             const handleToggle = async (index) => {
-                if (index === 12) return; // Free cell can't be toggled
+                if (index === 12) return;
                 if (!playerName) {
                     setError('Please enter player name');
                     return;
@@ -204,7 +212,6 @@
                 setToggled(newToggled);
 
                 try {
-                    // Update gameplay collection
                     const gameplayRef = db.collection('gameplay').doc(`${gameName}_${playerName}`);
                     await gameplayRef.set({
                         gameName,
@@ -214,7 +221,6 @@
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
 
-                    // Update game collection
                     const gameRef = db.collection('games').doc(gameName);
                     const gameToggled = [...gameData.toggled];
                     const phraseIndex = board[index] !== 'FREE' ? gameData.phrases.indexOf(board[index]) : -1;
@@ -223,7 +229,6 @@
                         await gameRef.update({ toggled: gameToggled });
                     }
 
-                    // Update other players' gameplay documents
                     const gameplayDocs = await db.collection('gameplay')
                         .where('gameName', '==', gameName)
                         .get();
@@ -279,6 +284,10 @@
 
         // Main App Component
         const App = () => {
+            if (!Route || !Routes || !BrowserRouter) {
+                console.error('Routing components missing:', { Route, Routes, BrowserRouter });
+                return <div>Error: Routing components not loaded. Please refresh the page.</div>;
+            }
             return (
                 <BrowserRouter>
                     <Routes>
@@ -293,4 +302,3 @@
     </script>
 </body>
 </html>
-
