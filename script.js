@@ -4,6 +4,9 @@ console.log("Phrase Bingo website loaded successfully!");
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
+// Log window.env to debug environment variables
+console.log("window.env:", window.env);
+
 // Firebase configuration using window.env
 const firebaseConfig = {
   apiKey: window.env.FIREBASE_API_KEY,
@@ -14,6 +17,9 @@ const firebaseConfig = {
   appId: window.env.FIREBASE_APP_ID,
   measurementId: window.env.FIREBASE_MEASUREMENT_ID
 };
+
+// Log firebaseConfig to debug
+console.log("firebaseConfig:", firebaseConfig);
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

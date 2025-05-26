@@ -31,10 +31,18 @@ const substituteEnvVars = (content) => {
     FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID || ''
   };
 
-  // Check for missing environment variables
-  const missingVars = Object.keys(envVars).filter(key => !envVars[key]);
-  if (missingVars.length > 0) {
-    console.warn(`Warning: The following environment variables are missing or empty: ${missingVars.join(', ')}`);
+  // Check for missing critical environment variables
+  const criticalVars = ['FIREBASE_PROJECT_ID', 'FIREBASE_API_KEY', 'FIREBASE_APP_ID'];
+  const missingCriticalVars = criticalVars.filter(key => !envVars[key]);
+  if (missingCriticalVars.length > 0) {
+    throw new Error(`Critical environment variables are missing or empty: ${missingCriticalVars.join(', ')}`);
+  }
+
+  // Log non-critical missing variables as a warning
+  const nonCriticalVars = Object.keys(envVars).filter(key => !criticalVars.includes(key));
+  const missingNonCriticalVars = nonCriticalVars.filter(key => !envVars[key]);
+  if (missingNonCriticalVars.length > 0) {
+    console.warn(`Warning: The following non-critical environment variables are missing or empty: ${missingNonCriticalVars.join(', ')}`);
   }
 
   // Substitute environment variables
